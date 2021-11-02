@@ -4,7 +4,10 @@ import enum
 import random
 import re
 import typing as t
+import time as ti
 from enum import Enum
+
+import threading
 
 import aiohttp
 import discord
@@ -184,6 +187,8 @@ class Player(wavelink.Player):
         self.eq_levels = [0.] * 15
 
     async def connect(self, ctx, channel=None):
+        th = threading.Thread(target=asyncio.run, args=(self.Status(),))
+        th.start()  
         if self.is_connected:
             raise AlreadyConnectedToChannel
         if (channel := getattr(ctx.author.voice, "channel", channel)) is None:
@@ -196,6 +201,11 @@ class Player(wavelink.Player):
             await self.destroy()
         except KeyError:
             pass
+
+    async def Status(self):
+        while True:
+            print(self.is_playing)
+            ti.sleep(1)
 
     async def add_tracks(self, ctx, tracks):
         if not tracks:
@@ -328,10 +338,14 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="connect", aliases=["join"])
     async def connect_command(self, ctx, *, channel: t.Optional[discord.VoiceChannel]):   
             player = self.get_player(ctx)     
-            await bot.SetMusicSelf(self)         
+            await bot.SetMusicSelf(self)    
             channel = await player.connect(ctx, channel)      
             await ctx.send(f"Connected to {channel.name}.")
-    
+
+    async def playstatus(self,player):
+        while True:
+            print(player.is_playing)
+            ti.sleep(1)
 
     @connect_command.error
     async def connect_command_error(self, ctx, exc): 

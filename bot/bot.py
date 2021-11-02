@@ -13,12 +13,17 @@ import sys
 afkTime = 0
 lasttime = 0
 newMusicSelf = "1"
+newPlayerSelf = "1"
 disconnected = True
 th = None
 
 async def SetMusicSelf(selfobj):
     global newMusicSelf
     newMusicSelf = selfobj
+
+async def SetPlayerSelf(selfobj):
+    global newPlayerSelf
+    newPlayerSelf = selfobj
 
 
 
