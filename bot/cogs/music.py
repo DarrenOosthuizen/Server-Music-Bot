@@ -204,7 +204,7 @@ class Player(wavelink.Player):
 
     async def Status(self):
         while True:
-            print(self.is_playing)
+            await bot.SetPlayerSelf(self.is_playing)
             ti.sleep(1)
 
     async def add_tracks(self, ctx, tracks):
