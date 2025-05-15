@@ -8,7 +8,7 @@ import time as ti
 from enum import Enum
 
 import threading
-
+import asyncio
 import aiohttp
 import discord
 import wavelink
@@ -337,6 +337,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="connect", aliases=["join"])
     async def connect_command(self, ctx, *, channel: t.Optional[discord.VoiceChannel]):   
+            print(self)
             player = self.get_player(ctx)     
             await bot.SetMusicSelf(self)    
             channel = await player.connect(ctx, channel)      
@@ -358,10 +359,11 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     async def disconnect_command(self, ctx):
         player = self.get_player(ctx)
         await player.teardown()
-        await ctx.send("Disconnected.") 
 
 
     async def disconnect_afk(self, ctx):
+        print(self)
+        print(ctx)
         player = self.get_player(ctx)
         await player.teardown()
 
@@ -369,7 +371,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="play")
     async def play_command(self, ctx, *, query: t.Optional[str]):
         player = self.get_player(ctx)
-        
+        await bot.SetMusicSelf(self)  
         if not player.is_connected:
             await player.connect(ctx)
 

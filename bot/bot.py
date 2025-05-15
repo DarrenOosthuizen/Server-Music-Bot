@@ -82,51 +82,45 @@ class MusicBot(commands.Bot):
         return commands.when_mentioned_or("-")(bot, msg)
         
     async def process_commands(self, msg):
-        global disconnected
-        global lasttime
-        global afkTime
-        global th
-        
         ctx = await self.get_context(msg, cls=commands.Context)
-        
-        lasttime = datetime.datetime.now()    
-        
-        afkTime = lasttime + datetime.timedelta(minutes = 10)
-        lasttime = datetime.datetime.strftime(lasttime,"%H:%M:%S")
-        afkTime = datetime.datetime.strftime(afkTime,"%H:%M:%S")
-        
-        th = threading.Thread(target=asyncio.run, args=(self.timeout(ctx),))
-        
-        print(disconnected)
-        if disconnected:
-            disconnected = False
-            th.start()
-            
-        
-        if ctx.command is not None:
-            await self.invoke(ctx)
+        if ctx.message.content.startswith('-') == True:
+            global disconnected
+            print(disconnected)
+            if disconnected:
+                disconnected = False
+                
+            if ctx.command is not None:
+                await self.invoke(ctx)
+            else:
+                em = discord.Embed(title=f"INVALID COMMAND",description=f"Command : {ctx.message.content} not found.", color=discord.Colour.red())
+                await ctx.send(embed=em)
+                await Help.help(self, ctx)   
         else:
-            em = discord.Embed(title=f"INVALID COMMAND",description=f"Command : {ctx.message.content} not found.", color=discord.Colour.red())
-            await ctx.send(embed=em)
-            await Help.help(self, ctx)         
+            print('Test')     
 
     
     async def timeout(self,ctx):
         try:
             global disconnected
             global newPlayerSelf
+            global afkTime
             while disconnected == False:
                 if(newPlayerSelf==False):
                     newtime = datetime.datetime.now()
                     newtime = datetime.datetime.strftime(newtime,"%H:%M:%S")
                     if(newtime == afkTime):
                         disconnected = True
+                        print("Disconnected due to AFK")
+                    print(afkTime)
+                else:
+                    afkTime = datetime.datetime.now() + datetime.timedelta(minutes = 5)
+                    afkTime = datetime.datetime.strftime(afkTime,"%H:%M:%S")
                     
                 t.sleep(1)
-            await Music.disconnect_afk(newMusicSelf,ctx)
 
         except Exception as e:
             print(e)
+
 
     async def on_message(self, msg):
         if not msg.author.bot:
